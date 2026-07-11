@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Deep learning-based speech-to-text NLP pipeline with real-time sentiment analysis and semantic similarity workflows.">
+    <title>Speech-to-Text NLP Analyzer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar for History -->
+        <aside class="sidebar" id="sidebar-history">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-clock-rotate-left"></i> Analysis Archive</h2>
+            </div>
+            <div class="sidebar-content">
+                <ul id="history-list" class="history-list">
+                    <li class="history-empty">No speeches analyzed yet</li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <p>Speech NLP Pipeline v1.0</p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-logo">
+                    <span class="logo-icon"><i class="fa-solid fa-brain-circuit"></i></span>
+                    <div class="logo-text">
+                        <h1>SpeechInsight</h1>
+                        <p>Speech-to-Text & Semantic NLP Pipeline</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- URL Input and Run Workflow Section -->
+            <section class="card input-section" id="url-input-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-circle-play"></i> Analyze New Speech</h2>
+                    <p>Paste a YouTube URL to transcribe, analyze sentiment trends, and query semantic similarity.</p>
+                </div>
+                <div class="card-body">
+                    <form id="analysis-form" class="analysis-form">
+                        <div class="input-wrapper">
+                            <i class="fa-brands fa-youtube youtube-icon"></i>
+                            <input 
+                                type="url" 
+                                id="youtube-url-input" 
+                                placeholder="https://www.youtube.com/watch?v=..." 
+                                required
+                            >
+                        </div>
+                        <button type="submit" id="submit-analysis-btn" class="primary-btn">
+                            <span class="btn-text">Process Video</span>
+                            <span class="btn-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                        </button>
+                    </form>
+
+                    <!-- Live Progress State -->
+                    <div id="progress-container" class="progress-container hidden">
+                        <div class="progress-details">
+                            <span id="progress-step-text">Initializing pipeline...</span>
+                            <span id="progress-percent-text">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-spinner">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Processing speech model inferences...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Notification Card -->
+            <div id="error-card" class="error-card hidden">
+                <div class="error-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div class="error-message">
+                    <h3>Analysis Failed</h3>
+                    <p id="error-details-text">An unexpected error occurred during processing.</p>
+                </div>
+                <button id="close-error-btn" class="close-error-btn">&times;</button>
+            </div>
+
+            <!-- Dashboard Visualizations & Results -->
+            <div id="results-container" class="results-container hidden">
+                
+                <!-- Video Title & Overview header -->
+                <div class="results-header-card card">
+                    <div class="video-meta-wrapper">
+                        <img id="speech-thumbnail" src="" alt="Thumbnail" class="video-thumbnail">
+                        <div class="video-meta-info">
+                            <h2 id="speech-title">Speech Title</h2>
+                            <p id="speech-uploader" class="uploader-name"><i class="fa-solid fa-user"></i> Channel Name</p>
+                            <div class="badges-row">
+                                <span id="speech-duration-badge" class="badge"><i class="fa-solid fa-clock"></i> 0:00</span>
+                                <span id="speech-lang-badge" class="badge accent-badge"><i class="fa-solid fa-language"></i> EN</span>
+                                <a id="speech-source-link" href="#" target="_blank" class="badge link-badge"><i class="fa-solid fa-arrow-up-right-from-square"></i> YouTube Video</a>
+                                <button id="delete-analysis-btn" class="badge delete-badge" title="Delete from database"><i class="fa-solid fa-trash"></i> Delete Analysis</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="card stat-card positive">
+                        <div class="stat-content">
+                            <h3>Positive Tone</h3>
+                            <div class="value" id="stat-positive-val">0.0%</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-face-smile"></i></div>
+                    </div>
+                    <div class="card stat-card neutral">
+                        <div class="stat-content">
+                            <h3>Neutral Tone</h3>
+                            <div class="value" id="stat-neutral-val">0.0%</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-face-meh"></i></div>
+                    </div>
+                    <div class="card stat-card negative">
+                        <div class="stat-content">
+                            <h3>Negative Tone</h3>
+                            <div class="value" id="stat-negative-val">0.0%</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-face-frown"></i></div>
+                    </div>
+                    <div class="card stat-card primary">
+                        <div class="stat-content">
+                            <h3>Tone Index</h3>
+                            <div class="value" id="stat-overall-val">0.0</div>
+                            <span class="subtext" id="stat-overall-text">Neutral speech</span>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
+                </div>
+
+                <!-- Chart and Similarity Search Grid -->
+                <div class="results-visuals-grid">
+                    <!-- Sentiment Over Time Chart -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-area"></i> Sentiment Trend Timeline</h3>
+                            <p>Tracks structural sentiment shift (Tone Index) paragraph-by-paragraph across the speech timeline.</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container-inner">
+                                <canvas id="sentiment-timeline-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Semantic Similarity Workflow Card -->
+                    <div class="card similarity-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Semantic Similarity Search</h3>
+                            <p>Type keywords or topics to find semantically relevant matches in the speech using Vector representations.</p>
+                        </div>
+                        <div class="card-body">
+                            <form id="semantic-search-form" class="semantic-search-form">
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                    <input 
+                                        type="text" 
+                                        id="semantic-query-input" 
+                                        placeholder="e.g. climate change, tax cuts, immigration..." 
+                                        required
+                                    >
+                                </div>
+                                <button type="submit" id="submit-search-btn" class="secondary-btn">Search</button>
+                            </form>
+
+                            <!-- Similarity Results List -->
+                            <div id="similarity-results" class="similarity-results scrollbar">
+                                <p class="placeholder-text">Search matching results will be listed here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Transcript Inspector -->
+                <section class="card transcript-card">
+                    <div class="card-header flex-header">
+                        <div>
+                            <h3><i class="fa-solid fa-file-invoice"></i> Speech Transcript & Sentiment Inspector</h3>
+                            <p>Detailed breakdown of transcription segments aligned with individual sentiment scores.</p>
+                        </div>
+                        <div class="transcript-actions">
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" id="filter-all" data-filter="all">All</button>
+                                <button class="filter-btn" id="filter-positive" data-filter="POSITIVE"><i class="fa-solid fa-circle positive-dot"></i> Positive</button>
+                                <button class="filter-btn" id="filter-neutral" data-filter="NEUTRAL"><i class="fa-solid fa-circle neutral-dot"></i> Neutral</button>
+                                <button class="filter-btn" id="filter-negative" data-filter="NEGATIVE"><i class="fa-solid fa-circle negative-dot"></i> Negative</button>
+                            </div>
+                            <button id="download-results-btn" class="outline-btn" title="Download Full JSON Report"><i class="fa-solid fa-download"></i> Export Data</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="transcript-table-container scrollbar">
+                            <table class="transcript-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 120px;">Timestamp</th>
+                                        <th>Segment Transcription</th>
+                                        <th style="width: 160px; text-align: center;">Sentiment Tone</th>
+                                        <th style="width: 120px; text-align: right;">Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transcript-table-body">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <!-- JavaScript Link -->
+    <script src="app.js"></script>
+</body>
+</html>

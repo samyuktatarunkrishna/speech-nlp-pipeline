@@ -1,0 +1,29 @@
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints
+venv/
+.venv/
+env/
+.env
+
+# Application Temp Audio Downloads & DB
+data/audio/*
+data/database.json
+!data/audio/.gitkeep
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

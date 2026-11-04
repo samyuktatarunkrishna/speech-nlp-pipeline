@@ -1,3 +1,12 @@
+---
+title: SpeechInsight
+emoji: 🎙️
+colorFrom: purple
+colorTo: blue
+sdk: docker
+app_port: 7860
+---
+
 # SpeechInsight: Speech-to-Text & Semantic NLP Pipeline
 
 SpeechInsight is a high-fidelity, deep learning-based Speech-to-Text NLP pipeline and analytical dashboard. It automates political speech and lecture analysis from YouTube URLs using automated audio extraction workflows, OpenAI Whisper transcription with alignment timestamps, Hugging Face Transformers for sentiment tone polarity profiling, and Sentence Transformers to map semantic vector space queries.
@@ -105,3 +114,17 @@ Ensure you have the following installed on your machine:
   - `numpy` (Mathematical vector similarity)
 - **Audio Extraction**: `yt-dlp` & `ffmpeg`
 - **Frontend**: HTML5, Vanilla CSS, JS (ES6), Chart.js
+
+
+## Public demo deployment (Hugging Face Spaces)
+
+1. Create a **public Docker Space** named `speech-nlp-pipeline`, using the blank template.
+2. Upload this repository's files to the Space, keeping `backend/`, `frontend/`, and `data/` as folders. Include `Dockerfile`, `requirements.txt`, and this README at the root.
+3. Wait for the Docker build to finish and the status to become **Running**.
+4. Open the App tab and test a short public video before sharing the Space URL.
+
+No API key is required. The first analysis downloads the Whisper, sentiment, and embedding model weights, and can take several minutes. CPU transcription is slower for longer recordings. YouTube may reject downloads from cloud IP addresses; a running dashboard does not guarantee every YouTube link can be processed.
+
+This is a public portfolio demo: analysis history is shared between visitors and is stored on ephemeral disk. Do not submit private recordings. History can disappear when the Space restarts. Available hardware and any subscription requirement are shown when creating the Space; do not select a paid option unless you intend to pay.
+
+For local container use: `docker build -t speechinsight .` then `docker run --rm -p 7860:7860 speechinsight`.
